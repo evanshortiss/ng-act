@@ -3,7 +3,7 @@ A wrapper for $fh.act to be used with Angular.
 
 ## Notes / TODO
 To use it you'll need to require the FH module for your Angular application. In this way more Angular wrappers can be built for other services in the FH namespace.
-This was developed as a service for part of a different project. I've made it into a Angular module here but it is untested in this form and the namespacing may cause the import to break.
+This was developed as a service for part of a different project. I've made it into a Angular module here but it is untested in this form and the namespacing may cause the import to break so feel free to fork and fix!
 
 ## Usage
 To use it you'll need to require the FH module for your Angular application and have included the FeedHenry JS SDK.
