@@ -33,3 +33,12 @@ angular.module('MyApp').service('MyService', ['FH.Act', function(Act) {
     };
 }]);
 ```
+
+## API
+
+### callFn(actName, [params,] callback)
+Call an Act with the given name, Params are optional. Callback has the format _function(err, res)_.
+
+### disableLogging
+
+### enableLogging
