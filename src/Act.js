@@ -3,7 +3,7 @@
 
     // Ensure FH module is defined
     try {
-        angular.module('FH')
+        angular.module('FH');
     } catch (e) {
         angular.module('FH', []);
     }
@@ -91,7 +91,11 @@
             }
 
             debug('"%s" failed with error %s', actname, ERR);
-            return callback(ERR, null);
+            return callback({
+                type: ERR,
+                err: err,
+                msg: details
+            }, null);
         }
 
 
