@@ -93,7 +93,7 @@
 
             // Return error that cloud code sent to it's callback
             else {
-                return callback(details, null);
+                return callback(ERRORS.CLOUD_ERROR, null);
             }
         }
 
