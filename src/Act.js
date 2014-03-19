@@ -18,10 +18,11 @@
 
         // Expose error types for checks by user
         var ERRORS = this.ERRORS = {
+            UNKNOWN_ERROR: 'UNKNOWN_ERROR',
             UNKNOWN_ACT: 'UNKNOWN_ACT',
             CLOUD_ERROR: 'CLOUD_ERROR',
             TIMEOUT: 'TIMEOUT',
-            NETWORK: 'NETWORK'
+            NO_NETWORK: 'NO_NETWORK'
         };
 
         // Controls whether debug logging is enabled
@@ -74,27 +75,23 @@
             // error_ajaxfail   | Object {status: 500, message: "error", error: "what you sent to main.js callback err param goes here!"}
             // error_ajaxfail   | Object {status: 0, message: "timeout", error: ""}
 
-            debug('"' + actname + '" failed with errors:', details);
+            var ERR = null;
 
             // Not sure of other error types thrown
             if(err !== 'error_ajaxfail') {
-                console.error('An unknown act call error occrued: ' + err, details);
-                return callback('An unknown error occured during a request ( "' + err + '" ).');
+                ERR = ERRORS.UNKNOWN_ERROR;
+            } else if(details.error.toLowerCase().indexOf(ACT_ERRORS.UNKNOWN_ACT) >= 0) {
+                ERR = ERRORS.UNKNOWN_ACT;
+            } else if(details.message.toLowerCase().indexOf(ACT_ERRORS.TIMEOUT) >= 0) {
+                ERR = ERRORS.TIMEOUT;
+            } else {
+                // Cloud code sent error to it's callback
+                debug('"%s" encountered an error in it\'s cloud code. Error: %j %j', actname, err, details);
+                ERR = ERRORS.CLOUD_ERROR;
             }
 
-            else if(details.error.toLowerCase().indexOf(ACT_ERRORS.UNKNOWN_ACT) >= 0) {
-                return callback(ERRORS.UNKNOWN_ACT, null);
-            }
-
-            else if(details.message.toLowerCase().indexOf(ACT_ERRORS.TIMEOUT) >= 0) {
-                debug('Timeout occured calling ')
-                return callback(ERRORS.TIMEOUT, null);
-            }
-
-            // Return error that cloud code sent to it's callback
-            else {
-                return callback(ERRORS.CLOUD_ERROR, null);
-            }
+            debug('"%s" failed with error %s', actname, ERR);
+            return callback(ERR, null);
         }
 
 
@@ -110,6 +107,12 @@
                 params = {};
             }
 
+            // Act parameters object
+            var opts = {
+                act: actname,
+                req: params
+            };
+
             // Check are we online before trying the request
             if($window.navigator.onLine === true) {
                 debug('Calling "' + actname + '" cloud side function.');
@@ -120,7 +123,7 @@
                 });
             } else {
                 debug('Could not call "' + actname + '". No network connection.');
-                return callback(ERRORS.NETWORK, null);
+                return callback(ERRORS.NO_NETWORK, null);
             }
         };
 
