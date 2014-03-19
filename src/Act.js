@@ -19,7 +19,7 @@
         // Expose error types for checks by user
         var ERRORS = this.ERRORS = {
             UNKNOWN_ACT: 'UNKNOWN_ACT',
-            INTERNAL_ERROR: 'INTERNAL_ERROR',
+            CLOUD_ERROR: 'CLOUD_ERROR',
             TIMEOUT: 'TIMEOUT',
             NETWORK: 'NETWORK'
         };
