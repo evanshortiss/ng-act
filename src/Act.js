@@ -9,22 +9,35 @@
     }
 
     angular.module('FH').service('FH.Act', function($rootScope, $window) {
-        var FH_ERRORS = {
+        // Error strings used for error type detection
+        var ACT_ERRORS = {
             UNKNOWN_ACT: 'no such function',
             INTERNAL_ERROR: 'internal error in',
             TIMEOUT: 'timeout'
         };
 
+        // Expose error types for checks by user
+        var ERRORS = this.ERRORS = {
+            UNKNOWN_ACT: 'UNKNOWN_ACT',
+            INTERNAL_ERROR: 'INTERNAL_ERROR',
+            TIMEOUT: 'TIMEOUT',
+            NETWORK: 'NETWORK'
+        };
+
         // Controls whether debug logging is enabled
         var printLogs = true;
+
 
         /**
          * Log debug output for this module.
          * @param {String}  str
          */
-        function debug(str) {
+        function debug() {
             if(printLogs === true) {
-                console.debug('$fh.act ' + new Date().toISOString() + ': ' + str);
+                args = Array.prototype.slice.call(arguments);
+                args.unshift('$fh.act ' + new Date().toISOString() + ': ');
+
+                console.debug.apply(console, args);
             }
         }
 
@@ -39,12 +52,7 @@
         function onSuccess(actname, res, callback) {
             // No response body maybe returned.
             // For example "return callback(null, null)" in the cloud
-            if(res && res.errors) {
-                debug('Called "' + actname + '" successfully but some errors were generated:', JSON.stringify(res.errors, null, 2));
-                return callback(res.errors, res);
-            }
-
-            debug('Called "' + actname + '" successfully with no errors.');
+            debug('Called "' + actname + '" successfully.');
 
             return callback(null, res);
         }
@@ -74,12 +82,13 @@
                 return callback('An unknown error occured during a request ( "' + err + '" ).');
             }
 
-            else if(details.error.toLowerCase().indexOf(FH_ERRORS.UNKNOWN_ACT) >= 0) {
-                return callback('Unknown cloud action "' + actname+ '" was called. (404)', null);
+            else if(details.error.toLowerCase().indexOf(ACT_ERRORS.UNKNOWN_ACT) >= 0) {
+                return callback(ERRORS.UNKNOWN_ACT, null);
             }
 
-            else if(details.message.toLowerCase().indexOf(FH_ERRORS.TIMEOUT) >= 0) {
-                return callback('Request timed out.', null);
+            else if(details.message.toLowerCase().indexOf(ACT_ERRORS.TIMEOUT) >= 0) {
+                debug('Timeout occured calling ')
+                return callback(ERRORS.TIMEOUT, null);
             }
 
             // Return error that cloud code sent to it's callback
@@ -103,6 +112,7 @@
 
             // Check are we online before trying the request
             if($window.navigator.onLine === true) {
+                debug('Calling "' + actname + '" cloud side function.');
                 $fh.act(opts, function(res) {
                     return onSuccess(actname, res, callback);
                 }, function(err, msg) {
@@ -110,7 +120,7 @@
                 });
             } else {
                 debug('Could not call "' + actname + '". No network connection.');
-                return callback('You have no network connection. Please enable 3G / Wifi and try again.', null);
+                return callback(ERRORS.NETWORK, null);
             }
         };
 
