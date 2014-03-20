@@ -86,7 +86,7 @@
                 ERR = ERRORS.TIMEOUT;
             } else {
                 // Cloud code sent error to it's callback
-                debug('"%s" encountered an error in it\'s cloud code. Error: %j %j', actname, err, details);
+                debug('"%s" encountered an error in it\'s cloud code. Error String: %s, Error Object: %o', actname, err, details);
                 ERR = ERRORS.CLOUD_ERROR;
             }
 
