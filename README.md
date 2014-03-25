@@ -14,7 +14,7 @@ a callback parameter.
 
 Here's an example of how you could use Act within a service.
 
-``` javascript
+```
 angular.module('MyApp', ['FH']).config(function() {
 
 });
@@ -76,7 +76,7 @@ Stop debug info being printed to the console.
 Restart debug info being printed to the console.
 
 ### ERRORS
-These are exposed so you can identify the reason for an error.
+These are exposed on the Act.ERRORS object so you can identify the reason for an error.
 
 ##### ERRORS.NO_ACTNAME_PROVIDED
 Indicates that no act name was provided to the call.
@@ -88,10 +88,10 @@ When an error occurs that can't be identified.
 Occurs when a non JSON response is provided to a cloud callback.
 
 ##### ERRORS.UNKNOWN_ACT
-The actname provided is not exposed in main.js.
+The act name provided is not exposed in main.js.
 
 ##### ERRORS.CLOUD_ERROR
-Indicates an error occured in the cloud code being called. This occurs if you return
+Indicates an error occurred in the cloud code being called. This occurs if you return
 an error to the main.js callback function.
 
 ##### ERRORS.TIMEOUT
