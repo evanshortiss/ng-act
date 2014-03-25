@@ -1,5 +1,9 @@
 # ng-act
-A wrapper for $fh.act to be used with Angular.
+A wrapper for $fh.act to be used with Angular. Available via bower:
+
+```
+bower install ng-act --save
+```
 
 ## Usage
 To use it you'll need to require the FH module for your Angular application (see below) and also
