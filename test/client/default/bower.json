@@ -1,0 +1,13 @@
+{
+  "name": "client",
+  "version": "0.0.0",
+  "homepage": "https://github.com/evanshortiss/ng-act",
+  "authors": [
+    "Evan Shortiss <evan.shortiss@feedhenry.com>"
+  ],
+  "license": "none",
+  "private": true,
+  "dependencies": {
+    "fh-js-sdk": "~1.1.4"
+  }
+}

@@ -5,12 +5,14 @@
     try {
         angular.module('FH');
     } catch (e) {
-        angular.module('FH', []);
+        angular.module('FH', ['ng']);
     }
 
-    angular.module('FH').service('FH.Act', function($rootScope, $window) {
+    angular.module('FH').service('FH.Act', function($rootScope, $q, $timeout, $window) {
         // Error strings used for error type detection
         var ACT_ERRORS = {
+            PARSE_ERROR: 'parseerror',
+            NO_ACTNAME: 'act_no_action',
             UNKNOWN_ACT: 'no such function',
             INTERNAL_ERROR: 'internal error in',
             TIMEOUT: 'timeout'
@@ -18,15 +20,19 @@
 
         // Expose error types for checks by user
         var ERRORS = this.ERRORS = {
+            NO_ACTNAME_PROVIDED: 'NO_ACTNAME_PROVIDED',
             UNKNOWN_ERROR: 'UNKNOWN_ERROR',
             UNKNOWN_ACT: 'UNKNOWN_ACT',
             CLOUD_ERROR: 'CLOUD_ERROR',
             TIMEOUT: 'TIMEOUT',
+            PARSE_ERROR: 'PARSE_ERROR',
             NO_NETWORK: 'NO_NETWORK'
         };
 
         // Controls whether debug logging is enabled
         var printLogs = true;
+        // Default time to wait for response
+        var defaultTimeout = 20 * 1000;
 
 
         /**
@@ -35,8 +41,8 @@
          */
         function debug() {
             if(printLogs === true) {
-                args = Array.prototype.slice.call(arguments);
-                args.unshift('$fh.act ' + new Date().toISOString() + ': ');
+                var args = Array.prototype.slice.call(arguments);
+                args[0] = '$fh.act ' + new Date().toISOString() + ': ' + args[0];
 
                 console.debug.apply(console, args);
             }
@@ -50,12 +56,10 @@
          * @param {Object}      res
          * @param {Function}    callback
          */
-        function onSuccess(actname, res, callback) {
-            // No response body maybe returned.
-            // For example "return callback(null, null)" in the cloud
+        function parseSuccess(actname, res) {
             debug('Called "' + actname + '" successfully.');
 
-            return callback(null, res);
+            return res;
         }
 
 
@@ -67,23 +71,19 @@
          * @param {Object}      details
          * @param {Function}    callback
          */
-        function onFail(actname, err, details, callback) {
-            // TODO: More investigation into errors Act calls can return
-            // Results from "console.log(err, msg)" below:
-            // err              |           details
-            // -------------------------------------
-            // error_ajaxfail   | Object {status: 500, message: "error", error: "what you sent to main.js callback err param goes here!"}
-            // error_ajaxfail   | Object {status: 0, message: "timeout", error: ""}
-
+        function parseFail(actname, err, details) {
             var ERR = null;
 
-            // Not sure of other error types thrown
-            if(err !== 'error_ajaxfail') {
+            if (err !== 'error_ajaxfail') {
                 ERR = ERRORS.UNKNOWN_ERROR;
-            } else if(details.error.toLowerCase().indexOf(ACT_ERRORS.UNKNOWN_ACT) >= 0) {
+            } else if (err === ERRORS.NO_ACTNAME_PROVIDED) {
+                ERR = ERRORS.NO_ACTNAME_PROVIDED;
+            } else if (details.error.toLowerCase().indexOf(ACT_ERRORS.UNKNOWN_ACT) >= 0) {
                 ERR = ERRORS.UNKNOWN_ACT;
-            } else if(details.message.toLowerCase().indexOf(ACT_ERRORS.TIMEOUT) >= 0) {
+            } else if (details.message.toLowerCase().indexOf(ACT_ERRORS.TIMEOUT) >= 0) {
                 ERR = ERRORS.TIMEOUT;
+            } else if (details.message === ACT_ERRORS.PARSE_ERROR) {
+                ERR = ERRORS.PARSE_ERROR;
             } else {
                 // Cloud code sent error to it's callback
                 debug('"%s" encountered an error in it\'s cloud code. Error String: %s, Error Object: %o', actname, err, details);
@@ -91,46 +91,119 @@
             }
 
             debug('"%s" failed with error %s', actname, ERR);
-            return callback({
+
+            return {
                 type: ERR,
                 err: err,
                 msg: details
-            }, null);
+            };
+        }
+
+
+        function safeApply(fn) {
+            var phase = $rootScope.$$phase;
+            if (phase == '$apply' || phase == '$digest') {
+                if (fn && (typeof(fn) === 'function')) {
+                    fn();
+                }
+            }
+            else {
+                $rootScope.$apply(fn);
+            }
+        }
+
+
+        /**
+         * Returns a successful act call.
+         * @param {Mixed} res
+         * @param {Promise} [promise]
+         * @param {Function} [callback]
+         */
+        function resolve(res, promise, callback) {
+            safeApply(function() {
+                if (callback) {
+                    callback(null ,res);
+                } else {
+                    promise.resolve(res);
+                }
+            });
+        }
+
+
+        /**
+         * Returns a failed act call.
+         * @param {Mixed} res
+         * @param {Promise} [promise]
+         * @param {Function} [callback]
+         */
+        function reject(err, promise, callback) {
+            safeApply(function() {
+                if (callback) {
+                    callback(err, null);
+                } else {
+                    promise.reject(err);
+                }
+            });
         }
 
 
         /**
          * Call an action on the cloud.
          * @param {String}      actname
-         * @param {Object}      params
-         * @param {Function}    callback
+         * @param {Object}      [params]
+         * @param {Function}    [callback]
          */
-        this.callFn = function(actname, params, callback) {
-            if(typeof params === 'function') {
+        this.callFn = function(actname, params, callback, timeout) {
+            var promise = null;
+
+            if (!callback && typeof params !== 'function') {
+                // User is not using callbacks (wants to use promises)
+                promise = $q.defer();
+            } else if (typeof params === 'function') {
+                // User is using callbacks
                 callback = params;
-                params = {};
+                params = null;
             }
 
-            // Act parameters object
+            // $fh.act parameters object
             var opts = {
                 act: actname,
-                req: params
+                req: params,
+                timeout: timeout || defaultTimeout
             };
 
             // Check are we online before trying the request
-            if($window.navigator.onLine === true) {
+            // For unit tests simply assume we have a connection
+            if ($window.navigator.onLine === true || window.mochaPhantomJS) {
                 debug('Calling "' + actname + '" cloud side function.');
-                $fh.act(opts, function(res) {
-                    return onSuccess(actname, res, callback);
-                }, function(err, msg) {
-                    return onFail(actname, err, msg, callback);
-                });
+
+                $timeout(function() {
+                    $fh.act(opts, function(res) {
+                        resolve(parseSuccess(actname, res), promise, callback);
+                    }, function(err, msg) {
+                        reject(parseFail(actname, err, msg), promise, callback);
+                    });
+                }, 10);
             } else {
                 debug('Could not call "' + actname + '". No network connection.');
-                return callback(ERRORS.NO_NETWORK, null);
+
+                $timeout(function(){
+                    reject({
+                        type: ERRORS.NO_NETWORK,
+                        err: null,
+                        msg: null
+                    }, promise, callback);
+                }, 0);
+            }
+
+            if(promise !== null) {
+                return promise.promise;
             }
         };
 
+        this.setDefaultTimeout = function(timeout) {
+            defaultTimeout = t;
+        };
 
         // Disable internal logging by this service.
         this.disableLogging = function() {

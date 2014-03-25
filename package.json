@@ -9,7 +9,6 @@
   "author": "Evan Shortiss <evan.shortiss@feedhenry.com>",
   "dependencies": {
     "grunt": "~0.4.4",
-    "grunt-shell": "~0.6.4",
     "grunt-mocha-phantomjs": "0.4.2",
     "phantomjs": "1.9.7-1",
     "mocha-phantomjs": "3.3.2"

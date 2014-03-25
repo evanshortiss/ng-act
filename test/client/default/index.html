@@ -10,8 +10,9 @@
     <div id="mocha"></div>
     <script src="mocha.js"></script>
     <script src="chai.js"></script>
-    <script src="feedhenry.js"></script>
+    <script src="bower_components/fh-js-sdk/dist/feedhenry-latest.js"></script>
     <script src="angular.js"></script>
+    <script src="../../../src/Act.js"></script>
 
     <script>
         mocha.setup('bdd');
@@ -20,7 +21,7 @@
     <script src="tests.js"></script>
 
     <script>
-        var app = angular.module('ngActTest', ['FH.Act']);
+        window.ngActTest = angular.module('ngActTest', ['FH']);
     </script>
 
     <script>
