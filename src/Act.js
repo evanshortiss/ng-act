@@ -177,13 +177,11 @@
             if ($window.navigator.onLine === true || window.mochaPhantomJS) {
                 debug('Calling "' + actname + '" cloud side function.');
 
-                $timeout(function() {
-                    $fh.act(opts, function(res) {
-                        resolve(parseSuccess(actname, res), promise, callback);
-                    }, function(err, msg) {
-                        reject(parseFail(actname, err, msg), promise, callback);
-                    });
-                }, 10);
+                $fh.act(opts, function(res) {
+                    resolve(parseSuccess(actname, res), promise, callback);
+                }, function(err, msg) {
+                    reject(parseFail(actname, err, msg), promise, callback);
+                });
             } else {
                 debug('Could not call "' + actname + '". No network connection.');
 
