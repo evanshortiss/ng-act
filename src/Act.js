@@ -40,7 +40,7 @@
          * @param {String}  str
          */
         function debug() {
-            if(printLogs === true) {
+            if (printLogs === true) {
                 var args = Array.prototype.slice.call(arguments);
                 args[0] = '$fh.act ' + new Date().toISOString() + ': ' + args[0];
 
@@ -74,8 +74,10 @@
         function parseFail(actname, err, details) {
             var ERR = null;
 
-            if (err !== 'error_ajaxfail') {
-                ERR = ERRORS.UNKNOWN_ERROR;
+            if (err === ACT_ERRORS.NO_ACTNAME) {
+                ERR = ERRORS.NO_ACTNAME_PROVIDED;
+            } else if (err !== 'error_ajaxfail') {
+                ERR = ERRORS.UKNOWN_ERROR;
             } else if (err === ERRORS.NO_ACTNAME_PROVIDED) {
                 ERR = ERRORS.NO_ACTNAME_PROVIDED;
             } else if (details.error.toLowerCase().indexOf(ACT_ERRORS.UNKNOWN_ACT) >= 0) {
@@ -106,8 +108,7 @@
                 if (fn && (typeof(fn) === 'function')) {
                     fn();
                 }
-            }
-            else {
+            } else {
                 $rootScope.$apply(fn);
             }
         }
@@ -122,7 +123,7 @@
         function resolve(res, promise, callback) {
             safeApply(function() {
                 if (callback) {
-                    callback(null ,res);
+                    callback(null, res);
                 } else {
                     promise.resolve(res);
                 }
@@ -177,15 +178,19 @@
             if ($window.navigator.onLine === true || window.mochaPhantomJS) {
                 debug('Calling "' + actname + '" cloud side function.');
 
-                $fh.act(opts, function(res) {
-                    resolve(parseSuccess(actname, res), promise, callback);
-                }, function(err, msg) {
-                    reject(parseFail(actname, err, msg), promise, callback);
-                });
+                // Need a timeout to ensure promise can be returned in the
+                // event of synchronous behaviour in $fh.act API
+                $timeout(function() {
+                    $fh.act(opts, function(res) {
+                        resolve(parseSuccess(actname, res), promise, callback);
+                    }, function(err, msg) {
+                        reject(parseFail(actname, err, msg), promise, callback);
+                    });
+                }, 0);
             } else {
                 debug('Could not call "' + actname + '". No network connection.');
 
-                $timeout(function(){
+                $timeout(function() {
                     reject({
                         type: ERRORS.NO_NETWORK,
                         err: null,
@@ -194,7 +199,7 @@
                 }, 0);
             }
 
-            if(promise !== null) {
+            if (promise !== null) {
                 return promise.promise;
             }
         };

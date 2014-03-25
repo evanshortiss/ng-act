@@ -25,6 +25,8 @@
             assert.ok(window.$fh);
         });
 
+        Act.disableLogging();
+
         describe('Valid and act calls that receive a response', function() {
             // Cloud success responses
             it('Should make a valid act call using a callback', function(done) {
@@ -55,7 +57,7 @@
 
             it('Should call an endpoint that returns an error using promises and hadle the error', function(done) {
                 Act.callFn('failingAct').then(function(res) {
-                    throw new Error('Act should have failed out!');
+                    done(new Error('Act should have failed out!'));
                 }, function(err) {
                     expect(err).to.be.an('object');
                     expect(err.type).to.equal(Act.ERRORS.CLOUD_ERROR);
@@ -105,13 +107,13 @@
                     expect(res.data).to.equal(randNumber);
                     done();
                 }, function(err) {
-                    throw new Error('Act should have worked!');
+                    done(new Error('Act should have worked!'));
                 });
             });
         });
 
 
-        describe('Act calls that are invalid', function() {
+        describe('Act calls that are invalid and cloud app doesn\t respond to or sends a malformed response', function() {
             // NON-EXISTENT ACT CALL
             it('Should try call to a non-existent endpoint and receive an error', function(done) {
                 Act.callFn('someFakeActName', function(err, res) {
@@ -123,7 +125,7 @@
 
             it('Should try call to a non-existent endpoint using promises and receive an error', function(done) {
                 Act.callFn('someFakeActName').then(function(res) {
-                    throw new Error('Act should have timed out!');
+                    done(new Error('Act should have timed out!'));
                 }, function(err) {
                     expect(err).to.be.an('object');
                     expect(err.type).to.equal(Act.ERRORS.UNKNOWN_ACT);
@@ -143,7 +145,7 @@
 
             it('Act call to an endpoint that doesn\'t return JSON but has Content-Type of JSON using promises, causes an error', function(done) {
                 Act.callFn('invalidStringAct').then(function(res) {
-                    throw new Error('Act should have timed out!');
+                    done(new Error('Act should have timed out!'));
                 }, function(err) {
                     expect(err).to.be.an('object');
                     expect(err.type).to.equal(Act.ERRORS.PARSE_ERROR);
@@ -153,23 +155,23 @@
 
 
             // PROVIDE NO ACTNAME
-            // it('Call Act.callFn without providing an Act name.', function(done) {
-            //     Act.callFn(null, function(err, res) {
-            //         expect(err).to.be.an('object');
-            //         expect(err.type).to.equal(Act.ERRORS.NO_ACTNAME_PROVIDED);
-            //         done();
-            //     });
-            // });
-            //
-            // it('Call Act.callFn without providing an Act name using promises', function(done) {
-            //     Act.callFn().then(function(res) {
-            //         throw new Error('Act should have timed out!');
-            //     }, function(err) {
-            //         expect(err).to.be.an('object');
-            //         expect(err.type).to.equal(Act.ERRORS.NO_ACTNAME_PROVIDED);
-            //         done();
-            //     });
-            // });
+            it('Call Act.callFn without providing an Act name.', function(done) {
+                Act.callFn(null, function(err, res) {
+                    expect(err).to.be.an('object');
+                    expect(err.type).to.equal(Act.ERRORS.NO_ACTNAME_PROVIDED);
+                    done();
+                });
+            });
+
+            it('Call Act.callFn without providing an Act name using promises', function(done) {
+                Act.callFn(null).then(function(res) {
+                    done(new Error('Act should have timed out!'));
+                }, function(err) {
+                    expect(err).to.be.an('object');
+                    expect(err.type).to.equal(Act.ERRORS.NO_ACTNAME_PROVIDED);
+                    done();
+                });
+            });
         });
     });
 
