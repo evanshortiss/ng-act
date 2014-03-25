@@ -3,3 +3,4 @@ node_modules
 test/cloud/node_modules
 fhc-debug.log
 bower_components
+npm-debug.log
