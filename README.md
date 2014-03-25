@@ -1,16 +1,14 @@
 # ng-act
 A wrapper for $fh.act to be used with Angular.
-To use it you'll need to require the FH module for your Angular application.
-In this way more Angular wrappers can be built for other services in the FH namespace.
 
 ## Usage
-To use it you'll need to require the FH module for your Angular application and
-have included the FeedHenry JS SDK in your project.
+To use it you'll need to require the FH module for your Angular application (see below) and also
+have included the [FeedHenry JS SDK](https://github.com/feedhenry/fh-js-sdk/) in your project.
 
 Unlike the standard usage for $fh.act this module accepts only a single
 callback and follows the node.js callback style with an error being the first parameter.
-If you wish you can also use a promise style with this service. Simply don't provide
-a callback parameter.
+If you wish you can also use a promise style with this service, simply don't provide
+a callback parameter when calling an act and an AngularJS promise is returned.
 
 Here's an example of how you could use Act within a service.
 

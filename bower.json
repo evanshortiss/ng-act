@@ -3,11 +3,10 @@
   "version": "0.0.0",
   "homepage": "https://github.com/evanshortiss/ng-act",
   "authors": [
-    "npm@feedhenry.com",
     "evanshortiss@gmail.com"
   ],
   "description": "AngularJS wrapper for FeedHenry's $fh.act",
-  "main": "src/Act.js",
+  "main": "./src/Act.js",
   "keywords": [
     "feedhenry",
     "$fh",
