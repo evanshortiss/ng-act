@@ -1,4 +1,4 @@
-(function(angular) {
+(function(angular, $fh) {
     'use strict';
 
     // Ensure FH module is defined
@@ -104,7 +104,7 @@
 
         function safeApply(fn) {
             var phase = $rootScope.$$phase;
-            if (phase == '$apply' || phase == '$digest') {
+            if (phase === '$apply' || phase === '$digest') {
                 if (fn && (typeof(fn) === 'function')) {
                     fn();
                 }
@@ -205,7 +205,7 @@
         };
 
         this.setDefaultTimeout = function(timeout) {
-            defaultTimeout = t;
+            defaultTimeout = timeout;
         };
 
         // Disable internal logging by this service.
@@ -219,4 +219,4 @@
         };
     });
 
-})(window.angular);
+})(window.angular, window.$fh);
