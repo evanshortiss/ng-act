@@ -1,12 +1,14 @@
 'use strict';
 
+var path = require('path');
+
 module.exports = function(grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
         mocha_phantomjs: {
-            all: ['test/client/default/index.html']
+            all: [path.join(__dirname, 'test/client/default/index.html')]
         },
 
         jshint: {
@@ -56,7 +58,7 @@ module.exports = function(grunt) {
                     "maxcomplexity": 14
                 },
                 files: {
-                    src: ['./src/Act.js']
+                    src: [path.join(__dirname, '/src/Act.js')]
                 }
             }
         },

@@ -8,6 +8,9 @@
   "license": "none",
   "private": true,
   "dependencies": {
+    "chai": "~1.9.1",
+    "mocha": "~1.18.2",
+    "angular": "1.0.7",
     "fh-js-sdk": "~1.1.4"
   }
 }
