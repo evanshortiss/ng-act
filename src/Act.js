@@ -189,7 +189,6 @@
                 }, 0);
             } else {
                 debug('Could not call "' + actname + '". No network connection.');
-
                 $timeout(function() {
                     reject({
                         type: ERRORS.NO_NETWORK,
