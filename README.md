@@ -53,14 +53,16 @@ angular.module('MyApp').service('MyService', ['FH.Act', function(Act) {
 ```
 
 ## Tests
-To run tests run ```npm install``` in the root directory. Now run the same
-command in the __test/cloud__ directory. Now run ```bower install``` in the
-__test/client/default__ directory.
+To run tests run ```npm install``` in the root directory.
 
-Open a terminal and go to __test/cloud/__ and run ```node application.js```
+Run ```npm install``` in the __test/cloud__ directory.
+
+Run ```bower install``` in the __test/client/default__ directory.
+
+Go to __test/cloud/__ and run ```node application.js```
 
 Now you can open __test/client/default/index.html__ or run ```grunt test``` from the root directory
-to run tests using PhantomJS.
+to run tests using PhantomJS so long as application.js is running.
 
 
 ## API
