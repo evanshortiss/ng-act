@@ -16,7 +16,7 @@ a callback parameter when calling an act and an AngularJS promise is returned.
 
 Here's an example of how you could use Act within a service.
 
-```
+```javascript
 angular.module('MyApp', ['FH']).config(function() {
 
 });
