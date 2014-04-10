@@ -27,7 +27,7 @@
 
         Act.disableLogging();
 
-        describe('Valid and act calls that receive a response', function() {
+        describe('Valid act calls that receive a response', function() {
             // Cloud success responses
             it('Should make a valid act call using a callback', function(done) {
                 Act.callFn('workingAct', function(err, res) {

@@ -9,6 +9,10 @@
     }
 
     angular.module('FH').service('FH.Act', function($rootScope, $q, $timeout, $window) {
+        if(typeof $fh === 'undefined') {
+            debug('Unable to detect $fh, please ensure you have included the feedhenry sdk.');
+        }
+
         // Error strings used for error type detection
         var ACT_ERRORS = {
             PARSE_ERROR: 'parseerror',
@@ -43,7 +47,6 @@
             if (printLogs === true) {
                 var args = Array.prototype.slice.call(arguments);
                 args[0] = '$fh.act ' + new Date().toISOString() + ': ' + args[0];
-
                 console.debug.apply(console, args);
             }
         }
@@ -153,17 +156,28 @@
          * @param {String}      actname
          * @param {Object}      [params]
          * @param {Function}    [callback]
+         * @param {Number}      [timeout]
          */
-        this.callFn = function(actname, params, callback, timeout) {
-            var promise = null;
+        this.callFn = function(actname, params, cb, timeout) {
+            var promise = null,
+                callback = null,
+                args = Array.prototype.slice.call(arguments)
 
-            if (!callback && typeof params !== 'function') {
-                // User is not using callbacks (wants to use promises)
+            // Find a callback if one exists
+            for(var i in args) {
+                if (typeof args[i] === 'function') {
+                    // User provided a callback
+                    callback = args[i];
+                }
+            }
+
+            if (callback) {
+                // Ensure we don't provde a function to req of $fh.act
+                if(params === callback) {
+                    params = null;
+                }
+            } else {
                 promise = $q.defer();
-            } else if (typeof params === 'function') {
-                // User is using callbacks
-                callback = params;
-                params = null;
             }
 
             // $fh.act parameters object
