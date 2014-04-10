@@ -187,30 +187,28 @@
                 timeout: timeout || defaultTimeout
             };
 
-            // Check are we online before trying the request
-            // For unit tests simply assume we have a connection
-            if ($window.navigator.onLine === true || window.mochaPhantomJS) {
-                debug('Calling "' + actname + '" cloud side function.');
+            // Wait a bit before calling so we can return the promise 
+            $timeout(function() {
+                // Check are we online before trying the request
+                // For unit tests simply assume we have a connection
+                if ($window.navigator.onLine === true || window.mochaPhantomJS) {
+                    debug('Calling "' + actname + '" cloud side function.');
 
-                // Need a timeout to ensure promise can be returned in the
-                // event of synchronous behaviour in $fh.act API
-                $timeout(function() {
                     $fh.act(opts, function(res) {
                         resolve(parseSuccess(actname, res), promise, callback);
                     }, function(err, msg) {
                         reject(parseFail(actname, err, msg), promise, callback);
                     });
-                }, 0);
-            } else {
-                debug('Could not call "' + actname + '". No network connection.');
-                $timeout(function() {
+                } else {
+                    debug('Could not call "' + actname + '". No network connection.');
+
                     reject({
                         type: ERRORS.NO_NETWORK,
                         err: null,
                         msg: null
                     }, promise, callback);
-                }, 0);
-            }
+                }
+            }, 0);
 
             if (promise !== null) {
                 return promise.promise;
