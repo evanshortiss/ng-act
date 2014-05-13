@@ -8,8 +8,8 @@
         angular.module('FH', ['ng']);
     }
 
-    angular.module('FH').service('FH.Act', ['$rootScope', '$q', '$timeout', '$window', 'FH.Network'
-        function($rootScope, $q, $timeout, $window, Network) {
+    angular.module('FH').service('FH.Act', ['$rootScope', '$q', '$timeout', '$window',
+        function($rootScope, $q, $timeout, $window) {
 
             // Error strings used for error type detection
             var ACT_ERRORS = {
@@ -159,15 +159,15 @@
             this.callFn = function(actname, params, cb, timeout) {
                 var promise = null,
                     callback = null,
-                    args = Array.prototype.slice.call(arguments)
+                    args = Array.prototype.slice.call(arguments);
 
-                    // Find a callback if one exists
-                    for (var i in args) {
-                        if (typeof args[i] === 'function') {
-                            // User provided a callback
-                            callback = args[i];
-                        }
+                // Find a callback if one exists
+                for (var i in args) {
+                    if (typeof args[i] === 'function') {
+                        // User provided a callback
+                        callback = args[i];
                     }
+                }
 
                 if (callback) {
                     // Ensure we don't provde a function to req of $fh.act
@@ -189,7 +189,7 @@
                 $timeout(function() {
                     // Check are we online before trying the request
                     // For unit tests simply assume we have a connection
-                    if (Network.isAvailable() === true || window.mochaPhantomJS) {
+                    if ($window.navigator.onLine === true || window.mochaPhantomJS) {
                         debug('Calling "' + actname + '" cloud side function.');
 
                         $fh.act(opts, function(res) {
