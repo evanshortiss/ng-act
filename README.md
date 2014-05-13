@@ -1,8 +1,14 @@
 # ng-act
-A wrapper for $fh.act to be used with Angular. Available via bower:
+A wrapper for $fh.act to be used with Angular. Available via bower or npm:
 
+### Bower
 ```
 bower install ng-act --save
+```
+
+### npm
+```
+npm install ng-act --save
 ```
 
 ## Usage

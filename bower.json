@@ -2,9 +2,7 @@
   "name": "ng-act",
   "version": "0.0.2",
   "homepage": "https://github.com/evanshortiss/ng-act",
-  "authors": [
-    "evanshortiss@gmail.com"
-  ],
+  "author": "Evan Shortiss",
   "description": "AngularJS wrapper for FeedHenry's $fh.act",
   "main": "./src/Act.js",
   "keywords": [

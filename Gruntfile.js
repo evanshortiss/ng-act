@@ -5,7 +5,7 @@ var path = require('path');
 module.exports = function(grunt) {
 
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: grunt.file.readJSON(path.join(__dirname, 'package.json')),
 
         mocha_phantomjs: {
             all: [path.join(__dirname, 'test/client/default/index.html')]

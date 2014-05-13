@@ -1,13 +1,25 @@
 {
   "name": "ng-act",
-  "version": "0.0.0",
-  "description": "Angular wrapper for FeedHenry's $fh.act",
-  "private": true,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "version": "0.0.2",
+  "description": "AngularJS wrapper for FeedHenry's $fh.act",
+  "author": "Evan Shortiss",
+  "license": "MIT",
+  "keywords": [
+    "fh",
+    "feedhenry",
+    "angularjs",
+    "angular",
+    "act"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/evanshortiss/ng-act.git"
   },
-  "author": "Evan Shortiss <evan.shortiss@feedhenry.com>",
-  "dependencies": {
+  "main": "./src/Act.js",
+  "bugs": {
+    "url": "https://github.com/evanshortiss/ng-act/issues"
+  },
+  "devDependencies": {
     "grunt": "~0.4.4",
     "grunt-mocha-phantomjs": "0.4.2",
     "grunt-contrib-jshint": "~0.8.0",
