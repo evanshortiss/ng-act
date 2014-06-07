@@ -1,6 +1,6 @@
 {
   "name": "ng-act",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "https://github.com/evanshortiss/ng-act",
   "author": "Evan Shortiss",
   "description": "AngularJS wrapper for FeedHenry's $fh.act",
