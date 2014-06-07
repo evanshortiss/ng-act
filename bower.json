@@ -16,5 +16,8 @@
     "node_modules",
     "bower_components",
     "test"
-  ]
+  ],
+  "dependencies": {
+    "fh-js-sdk": "~2.0.24"
+  }
 }
